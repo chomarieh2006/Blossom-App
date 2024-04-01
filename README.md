@@ -1,4 +1,5 @@
 # Blossom
+# ![blossom_logo-removebg-preview](https://github.com/chomarieh2006/Blossom-App/assets/71354208/71737ae6-4593-491c-ae98-b169081bc7f2)  
 Team Members: Sneha Shekhar, Marie Cho, Aanya Singh
 ## Project goals and features:
 - Our goal is to fuel productivity in our users and give them motivation to do their daily tasks.
@@ -14,7 +15,6 @@ Team Members: Sneha Shekhar, Marie Cho, Aanya Singh
   - Task History/ Calendar (tracks progress)
   - Zoom in on a day (Select a day on the task history calendar, and this screen displays the stats from that day!)
 - We have a nav bar on each page for easy navigation.
-- ![blossom_logo-removebg-preview](https://github.com/chomarieh2006/Blossom-App/assets/71354208/71737ae6-4593-491c-ae98-b169081bc7f2)
 - [app layout.pdf](https://github.com/chomarieh2006/Blossom-App/files/14824910/app.layout.pdf)
 
 
