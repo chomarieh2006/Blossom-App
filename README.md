@@ -1,4 +1,4 @@
-# Blossom-App
+# Blossom
 Team Members: Sneha Shekhar, Marie Cho, Aanya Singh
 ## Project goals and features:
 - Our goal is to fuel productivity in our users and give them motivation to do their daily tasks.
