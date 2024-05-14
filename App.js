@@ -173,7 +173,7 @@ export default class App extends Component {
     this.setState(() => ({
       tasksIncomplete: this.state.tasksIncomplete.filter(e => e !== task),
       tasksComplete: [...this.state.tasksComplete, task],
-      incomplete: this.state.incomplete + 1,
+      incomplete: this.state.incomplete - 1,
       complete: this.state.complete + 1,
     }));
     console.log("incomplete: " + this.state.incomplete);
