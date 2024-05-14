@@ -17,8 +17,14 @@ Team Members: Sneha Shekhar, Marie Cho, Aanya Singh
 - We have a nav bar on each page for easy navigation.
 - [app layout.pdf](https://github.com/chomarieh2006/Blossom-App/files/14824910/app.layout.pdf)
 ### Elements:
+- To-Do List:
+  - Here, you can add new tasks for yourself to do.
+  - When you’re done with something, check it so that it can count as completed. Uncheck to mark as incomplete again. This links to plant growth!
+  - Resets every day.
 - Plant Growth:
   - With each task completed, the plant grows! If you uncheck a task, then the plant un-grows. The plant maxes out at the 11th stage! Once you have completed more than 11 tasks, you have reached full growth and can keep doing tasks for your own satisfaction <3
+  - The number of tasks complete and incomplete is also displayed below the plant.
+  - ADDED PERK: You can name your plant :D
 - Task History:
   - We wanted users to be able to access their task history and see how productive they were on previous days. We used AsyncStorage, a library provided by React Native, to store this information in the memory instead of using a database. The data is stored even after the app is closed. Users click on a day on the calendar which displays the number of complete and incomplete tasks they had by the end of the day
 ## Resources Used:
