@@ -1,7 +1,8 @@
-
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, ImageBackground, TouchableHighlight, Alert, Dimensions, ScrollView } from 'react-native';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let deviceHeight = Dimensions.get('window').height;
 let deviceWidth = Dimensions.get('window').width;
@@ -16,16 +17,73 @@ export default class App extends Component {
     addTaskDisplay: 'none',
     tasksComplete: [],
     tasksIncomplete: [],
-    addTask: 'Type in new task',
+    complete:0,
+    incomplete:0,
+    addTask: '',
     plantName: 'Name your plant!',
-    plantGrowth:["./assets/PlantImages/Plant1.jpg", 
-    "./assets/PlantImages/Plant2.jpg", "./assets/PlantImages/Plant3.jpg", 
-    "./assets/PlantImages/Plant4.jpg","./assets/PlantImages/Plant5.jpg", 
-    "./assets/PlantImages/Plant6.jpg","./assets/PlantImages/Plant7.jpg", 
-    "./assets/PlantImages/Plant8.jpg","./assets/PlantImages/Plant9.jpg", 
-    "./assets/PlantImages/Plant10.jpg", "./assets/PlantImages/Plant11.jpg"],
-    
+    plantGrowth: ["./assets/PlantImages/Plant1.jpg",
+      "./assets/PlantImages/Plant2.jpg", "./assets/PlantImages/Plant3.jpg",
+      "./assets/PlantImages/Plant4.jpg", "./assets/PlantImages/Plant5.jpg",
+      "./assets/PlantImages/Plant6.jpg", "./assets/PlantImages/Plant7.jpg",
+      "./assets/PlantImages/Plant8.jpg", "./assets/PlantImages/Plant9.jpg",
+      "./assets/PlantImages/Plant10.jpg", "./assets/PlantImages/Plant11.jpg"],
+    plantVariable: 0,
+    daysCompleteTasks: 0,
+    daysIncompleteTasks: 0,
+    date: new Date(),
+    datee:'today'
+
   };
+
+  _storeData = async () => {
+    console.log(this.getFormattedDate(this.state.date));
+    try {
+      await AsyncStorage.setItem(
+        this.getFormattedDate(this.state.date),
+        [this.state.complete, this.state.incomplete],
+      );
+
+      console.log('successfully stored data');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  _getData = async (date) => {
+    console.log(date);
+    try {
+      const value = await AsyncStorage.getItem(date);
+      if (value !== null) {
+        // We have data!!
+        console.log(value);
+
+        console.log('successfully retrieved data');
+        this.setState((state) => ({
+          daysCompleteTasks: value[0],
+          daysIncompleteTasks: value[2]
+        }));
+      } else {
+        console.log(console.log('did not retrieve data'));
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+  }
+
+  getFormattedDate(date) {
+    let year = date.getFullYear();
+    let month = (1 + date.getMonth()).toString().padStart(2, '0');
+    let day = date.getDate().toString().padStart(2, '0');
+
+    console.log(month + '-' + day + '-' + year);
+
+    return month + '-' + day + '-' + year;
+  }
+
+  formatDate = (dateString) => {
+    var spl = dateString.split("-");
+    return (spl[1] + "-" + spl[2] + "-" + spl[0]);
+  } 
 
   toggleAddTaskDisplay = () => {
     if (this.state.addTaskDisplay === 'none') {
@@ -48,7 +106,7 @@ export default class App extends Component {
       historyPageDisplay: 'none',
       zoomInPageDisplay: 'none',
     }));
-    handleTaskPagePress = () =>
+  handleTaskPagePress = () =>
     this.setState((state) => ({
       homePageDisplay: 'none',
       plantPageDisplay: 'none',
@@ -56,82 +114,116 @@ export default class App extends Component {
       historyPageDisplay: 'none',
       zoomInPageDisplay: 'none',
     }));
-    handleHistoryPagePress = () =>
-      this.setState((state) => ({
-        homePageDisplay: 'none',
-        plantPageDisplay: 'none',
-        tasksPageDisplay: 'none',
-        historyPageDisplay: 'block',
-        zoomInPageDisplay: 'none',
-      }));
+  handleHistoryPagePress = () =>
+    this.setState((state) => ({
+      homePageDisplay: 'none',
+      plantPageDisplay: 'none',
+      tasksPageDisplay: 'none',
+      historyPageDisplay: 'block',
+      zoomInPageDisplay: 'none',
+    }));
 
 
-      handleIncompleteTask = (task) => {
-      if(this.state.plantState >= 10){
-        this.setState({
-          currentPlantImage: this.state.plantGrowth[11]
-        })
-      }
+  handleIncompleteTask = (task) => {
+    if (this.state.tasksComplete.length <= 10) {
       this.setState(() => ({
-        tasksIncomplete: this.state.tasksIncomplete.filter(e => e !== task),
-        tasksComplete: [...this.state.tasksComplete, task],
-        plantState: this.state.plantState + 1,     
-        currentPlantImage: this.state.plantGrowth[this.state.plantState],
+        plantVariable: this.state.tasksComplete.length,
       }));
     }
-  
-    handleCompleteTask = (task) => {
-      if(this.state.plantState >= 10){
-        this.setState({
-          currentPlantImage: this.state.plantGrowth[11]
-        })
-      }
+    else {
       this.setState(() => ({
-        tasksComplete: this.state.tasksComplete.filter(e => e !== task),
-        tasksIncomplete: [...this.state.tasksIncomplete, task],
-        plantState: this.state.plantState - 1,
-        currentPlantImage: this.state.plantGrowth[this.state.plantState],
-        
-      }))
+        plantVariable: 10,
+      }));
     }
-  
-    addNewTask = () => {
+    this.setState(() => ({
+      tasksIncomplete: this.state.tasksIncomplete.filter(e => e !== task),
+      tasksComplete: [...this.state.tasksComplete, task]
+    }));
+  }
+  disappearText = () => {
+    addTask = ''
+  }
+
+  handleCompleteTask = (task) => {
+    if (this.state.tasksComplete.length <= 10) {
       this.setState(() => ({
-        tasksIncomplete: [...this.state.tasksIncomplete, this.state.addTask],
-        addTask: 'Type your task in here',
-      }))
+        plantVariable: this.state.tasksComplete.length,
+      }));
     }
+    else {
+      this.setState(() => ({
+        plantVariable: 10,
+      }));
+    }
+    this.setState(() => ({
+      tasksComplete: this.state.tasksComplete.filter(e => e !== task),
+      tasksIncomplete: [...this.state.tasksIncomplete, task],
+    }))
+  }
+
+  addNewTask = () => {
+    this.setState(() => ({
+      tasksIncomplete: [...this.state.tasksIncomplete, this.state.addTask],
+      addTask: '',
+    }))
+  }
+
+
+  handleIncompleteTask2 = (task) => {
+    this.setState(() => ({
+      tasksIncomplete: this.state.tasksIncomplete.filter(e => e !== task),
+      tasksComplete: [...this.state.tasksComplete, task],
+      incomplete: this.state.incomplete + 1,
+      complete: this.state.complete + 1,
+    }));
+    console.log("incomplete: " + this.state.incomplete);
+    console.log("complete: " + this.state.complete);
+  }
+
+  handleCompleteTask2 = (task) =>
+    this.setState(() => ({
+      tasksComplete: this.state.tasksComplete.filter(e => e !== task),
+      tasksIncomplete: [...this.state.tasksIncomplete, task],
+      incomplete: this.state.incomplete + 1,
+      complete: this.state.complete - 1,
+    }))
 
 
   render() {
     return (
       <View style={styles.container}>
         <View style={{ display: this.state.homePageDisplay }}>
-        <View style={styles.container3}>
-         
-      <Text style = {styles.welcometext}>Welcome to</Text>
-      <Image
-            source = {require("./assets/PlantImages/blossomLogo.png")}
-            style ={styles.logoFormatting}
-            
-      />
-      <TouchableHighlight onPress={this.handlePlantGrowthPagePress} style={styles.button} >
-        <Text>GO TO APP ➡</Text>
+          <View style={styles.container3}>
 
-      </TouchableHighlight>
+            <Text style={styles.welcometext}>Welcome to </Text>
+            <Image
+              source={require("./assets/PlantImages/blossomLogo.png")}
+              style={styles.logoFormatting}
 
-    </View>
+            />
+
+            <View style={styles.container7}>
+              <Text style={styles.instructions}> Set tasks everyday and complete them to grow your plant! </Text>
+            </View>
+            <TouchableHighlight onPress={this.handlePlantGrowthPagePress} style={styles.button} >
+              <Text>GO TO APP ➡ </Text>
+
+            </TouchableHighlight>
+
           </View>
+        </View>
 
-          <View style={{ display: this.state.tasksPageDisplay }}>
+         <View style={{ display: this.state.tasksPageDisplay }}>
           <View style={styles.container2}>
 
-            <TouchableHighlight onPress={this.toggleAddTaskDisplay}>
+            <TouchableHighlight onPress={this.toggleAddTaskDisplay} >
               <Text style={styles.title}>+ New Task</Text>
             </TouchableHighlight>
+
             <View style={{ display: this.state.addTaskDisplay }}>
               <View style={styles.container4}>
                 <TextInput style={styles.inputtext}
+                placeholder='Enter task'
                   value={this.state.addTask}
                   onChangeText={(val) => this.setState({
                     addTask: val,
@@ -142,9 +234,9 @@ export default class App extends Component {
                 </TouchableHighlight>
               </View>
             </View>
-                  <ScrollView>
+
             {this.state.tasksIncomplete.map((task, i) => (
-              <TouchableHighlight key={i} onPress={() => this.handleIncompleteTask(task)}>
+              <TouchableHighlight key={i} onPress={() => this.handleIncompleteTask2(task)}>
 
                 <View style={styles.task} >
                   <Text style={styles.tasktext}>{task}</Text>
@@ -154,7 +246,7 @@ export default class App extends Component {
             }
             <View style={{ "textDecoration": "line-through" }}>
               {this.state.tasksComplete.map((task, i) => (
-                <TouchableHighlight key={i} onPress={() => this.handleCompleteTask(task)}>
+                <TouchableHighlight key={i} onPress={() => this.handleCompleteTask2(task)}>
                   <View style={styles.task}>
                     <Text style={styles.tasktext}>{task}</Text>
                   </View>
@@ -162,88 +254,58 @@ export default class App extends Component {
               ))
               }
             </View>
-            </ScrollView>
-            </View>
-            <View style={styles.navcontainer}>
-              <TouchableHighlight style={styles.buttoncontainer}
-                onPress={this.handlePlantGrowthPagePress}
-              >
-                <Text style={styles.buttontext}>
-                  Plant
-                </Text>
-              </TouchableHighlight>
 
-              <TouchableHighlight style={styles.buttoncontainer}
-                onPress={this.handleTaskPagePress}
-              >
-                <Text style={styles.buttontext}>
-                  Tasks
-                </Text>
-              </TouchableHighlight>
+            <TouchableHighlight onPress={() => this._storeData()}><Text>End Day</Text></TouchableHighlight>
 
-              <TouchableHighlight style={styles.buttoncontainer}
-                onPress={this.handleHistoryPagePress}
-              >
-                <Text style={styles.buttontext}>
-                  History
-                </Text>
-              </TouchableHighlight>
-              </View>
-              </View>
+          </View>
+          <View style={styles.navcontainer}>
 
-            <View style={{ display: this.state.plantPageDisplay }}>
+            <TouchableHighlight style={styles.buttoncontainer}
+              onPress={this.handlePlantGrowthPagePress}
+            >
+              <Text style={styles.buttontext}>
+                Plant
+              </Text>
+            </TouchableHighlight>
+
+            <TouchableHighlight style={styles.buttoncontainer}
+              onPress={this.handleTaskPagePress}
+            >
+              <Text style={styles.buttontext}>
+                Tasks
+              </Text>
+            </TouchableHighlight>
+
+            <TouchableHighlight style={styles.buttoncontainer}
+              onPress={this.handleHistoryPagePress}
+            >
+              <Text style={styles.buttontext}>
+                History
+              </Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+
+         <View style={{ display: this.state.plantPageDisplay }}>
           <View style={styles.container6}>
-          <View>
-                <TextInput style={styles.inputtext}
-                  value={this.state.plantName}
-                  onChangeText={(val) => this.setState({
-                    plantName: val,
-                  })}
-                ></TextInput>
+            <View>
+              <TextInput style={styles.inputtext}
+                value={this.state.plantName}
+                onChangeText={(val) => this.setState({
+                  plantName: val,
+                })}
+              ></TextInput>
               <Image
-                source = {this.state.plantGrowth[this.state.tasksComplete.length]}
-                style ={styles.imageFormatting} 
+                source={this.state.plantGrowth[this.state.plantVariable]}
+                style={styles.imageFormatting}
               />
-              <Text style = {styles.statsText}>
+              <Text style={styles.statsText}>
                 Tasks Completed Today: {this.state.tasksComplete.length}
               </Text>
-              <Text style = {styles.statsText}>
+              <Text style={styles.statsText}>
                 Tasks Incomplete Today: {this.state.tasksIncomplete.length}
               </Text>
-          </View>
-          </View>
-
-          <View style={styles.navcontainer}>
-
-            <TouchableHighlight style={styles.buttoncontainer}
-              onPress={this.handlePlantGrowthPagePress}
-            >
-              <Text style={styles.buttontext}>
-                Plant
-              </Text>
-            </TouchableHighlight>
-
-            <TouchableHighlight style={styles.buttoncontainer}
-              onPress={this.handleTaskPagePress}
-            >
-              <Text style={styles.buttontext}>
-                Tasks
-              </Text>
-            </TouchableHighlight>
-
-            <TouchableHighlight style={styles.buttoncontainer}
-              onPress={this.handleHistoryPagePress}
-            >
-              <Text style={styles.buttontext}>
-                History
-              </Text>
-            </TouchableHighlight>
-          </View>
-        </View>
-
-        <View style={{ display: this.state.historyPageDisplay }}>
-          <View style={styles.container2}>
-            <Text>{this.state.plantName}'s Calendar:</Text>
+            </View>
           </View>
 
           <View style={styles.navcontainer}>
@@ -272,11 +334,50 @@ export default class App extends Component {
               </Text>
             </TouchableHighlight>
           </View>
-        </View>
+        </View> 
+
+         <View style={{ display: this.state.historyPageDisplay }}>
+          <View style={styles.container5}>
+            <Text style={styles.statsText}>{this.state.plantName}'s Calendar:</Text>
+
+            <View style={styles.calStyle}>
+            <Calendar onDayPress={day => this._getData(this.formatDate(day.dateString))} />
+            </View>
+
+            <Text style={styles.statsText}>Completed Tasks: {this.state.daysCompleteTasks}</Text>
+            <Text style={styles.statsText}>Incompleted Tasks: {this.state.daysIncompleteTasks}</Text>
+
+          </View>
+          <View style={styles.navcontainer}>
+
+            <TouchableHighlight style={styles.buttoncontainer}
+              onPress={this.handlePlantGrowthPagePress}
+            >
+              <Text style={styles.buttontext}>
+                Plant
+              </Text>
+            </TouchableHighlight>
+
+            <TouchableHighlight style={styles.buttoncontainer}
+              onPress={this.handleTaskPagePress}
+            >
+              <Text style={styles.buttontext}>
+                Tasks
+              </Text>
+            </TouchableHighlight>
+
+            <TouchableHighlight style={styles.buttoncontainer}
+              onPress={this.handleHistoryPagePress}
+            >
+              <Text style={styles.buttontext}>
+                History
+              </Text>
+            </TouchableHighlight>
+          </View>
 
 
-
-
+        </View> 
+        
         <StatusBar style="auto" />
       </View>
     );
@@ -295,15 +396,34 @@ const styles = StyleSheet.create({
     height: 5 * (deviceHeight / 6),
     alignItems: 'center',
   },
+  container5: {
+    height: 5 * (deviceHeight / 6),
+    width: deviceWidth,
+    alignItems: 'center'
+
+  },
   container6: {
     height: 5 * (deviceHeight / 6),
     alignItems: 'center',
     justifyContent: 'center',
-    
+
   },
-  statsText:{
+  container7: {
+    height: deviceHeight / 6,
+    width: deviceWidth / 3,
+    alignItems: 'center',
+    justifyContent: 'center',
     textAlign: 'center',
-    fontSize:15,
+  },
+  instructions: {
+    fontSize: deviceHeight / 40,
+    color: 'green',
+    textAlign: 'center',
+  },
+  statsText: {
+    textAlign: 'center',
+    fontSize: 15,
+    color: 'green',
   },
   container4: {
     flex: 1,
@@ -340,69 +460,4 @@ const styles = StyleSheet.create({
     color: 'pink',
     fontWeight: 'bold',
   },
-  addtask: {
-    fontSize: deviceHeight / 35,
-    height: deviceHeight / 25,
-    width: deviceWidth / 5,
-    color: 'pink',
-    fontWeight: 'bold',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-  },
-  tasktext: {
-    fontSize: deviceHeight / 20,
-    color: 'green',
-  },
-  addTaskDisplay: {
-    height: deviceHeight / 10,
-    width: deviceWidth,
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    flexDirection: 'row',
-    borderColor: 'green',
-    borderWidth: 2,
-  },
-  inputtext: {
-    fontSize: deviceHeight / 35,
-    color: 'green',
-    height: deviceHeight / 25,
-    width: deviceWidth / 3.5,
-    borderColor: 'green',
-    borderWidth: 2,
-    backgroundColor: 'pink',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    margin: 5,
-  },
-  navcontainer: {
-    height: deviceHeight / 6,
-    width: deviceWidth,
-    backgroundColor: 'pink',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    flexDirection: 'row',
-  },
-  buttoncontainer: {
-    height: deviceHeight / 15,
-    width: deviceWidth / 3.5,
-    borderColor: 'green',
-    borderWidth: 2,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    margin: 5,
-  },
-  buttontext: {
-    fontSize: deviceHeight / 20,
-    color: 'green',
-  },
-  imageFormatting:{
-    height: deviceHeight/2,
-    width: deviceHeight/2
-  }
 });
