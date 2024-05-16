@@ -1,3 +1,4 @@
+
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, ImageBackground, TouchableHighlight, Alert, Dimensions, ScrollView } from 'react-native';
@@ -17,8 +18,8 @@ export default class App extends Component {
     addTaskDisplay: 'none',
     tasksComplete: [],
     tasksIncomplete: [],
-    complete:0,
-    incomplete:0,
+    complete: 0,
+    incomplete: 0,
     addTask: '',
     plantName: 'Name your plant!',
     plantGrowth: ["./assets/PlantImages/Plant1.jpg",
@@ -31,7 +32,7 @@ export default class App extends Component {
     daysCompleteTasks: 0,
     daysIncompleteTasks: 0,
     date: new Date(),
-    datee:'today'
+    datee: 'today'
 
   };
 
@@ -40,7 +41,7 @@ export default class App extends Component {
     try {
       await AsyncStorage.setItem(
         this.getFormattedDate(this.state.date),
-        [this.state.complete, this.state.incomplete],
+        [this.state.tasksComplete.length, this.state.tasksIncomplete.length],
       );
 
       console.log('successfully stored data');
@@ -83,7 +84,7 @@ export default class App extends Component {
   formatDate = (dateString) => {
     var spl = dateString.split("-");
     return (spl[1] + "-" + spl[2] + "-" + spl[0]);
-  } 
+  }
 
   toggleAddTaskDisplay = () => {
     if (this.state.addTaskDisplay === 'none') {
@@ -124,42 +125,6 @@ export default class App extends Component {
     }));
 
 
-  handleIncompleteTask = (task) => {
-    if (this.state.tasksComplete.length <= 10) {
-      this.setState(() => ({
-        plantVariable: this.state.tasksComplete.length,
-      }));
-    }
-    else {
-      this.setState(() => ({
-        plantVariable: 10,
-      }));
-    }
-    this.setState(() => ({
-      tasksIncomplete: this.state.tasksIncomplete.filter(e => e !== task),
-      tasksComplete: [...this.state.tasksComplete, task]
-    }));
-  }
-  disappearText = () => {
-    addTask = ''
-  }
-
-  handleCompleteTask = (task) => {
-    if (this.state.tasksComplete.length <= 10) {
-      this.setState(() => ({
-        plantVariable: this.state.tasksComplete.length,
-      }));
-    }
-    else {
-      this.setState(() => ({
-        plantVariable: 10,
-      }));
-    }
-    this.setState(() => ({
-      tasksComplete: this.state.tasksComplete.filter(e => e !== task),
-      tasksIncomplete: [...this.state.tasksIncomplete, task],
-    }))
-  }
 
   addNewTask = () => {
     this.setState(() => ({
@@ -170,23 +135,72 @@ export default class App extends Component {
 
 
   handleIncompleteTask2 = (task) => {
+    // this.setState((prevState) => {
+    //   /* const newIncompleteCount = prevState.incomplete > 0 ? prevState.incomplete - 1 : prevState.incomplete;
+    //   const newCompleteCount = prevState.complete + 1; */
+
+    //   return {
+    //     tasksIncomplete: prevState.tasksIncomplete.filter(e => e !== task),
+    //     tasksComplete: [...prevState.tasksComplete, task],
+    //     incomplete: this.state.tasksIncomplete.length,
+    //     complete:  this.state.tasksComplete.length,
+    //   };
+    // }, () => {
+    //   console.log("incomplete: " + this.state.incomplete);
+    //   console.log("complete: " + this.state.complete);
+    // });
+    if (this.state.tasksComplete.length <= 10) {
+      this.setState(() => ({
+        plantVariable: this.state.tasksComplete.length,
+      }));
+    }
+    else if (this.state.tasksComplete.length > 10) {
+      this.setState(() => ({
+        plantVariable: 10,
+      }));
+    }
     this.setState(() => ({
       tasksIncomplete: this.state.tasksIncomplete.filter(e => e !== task),
       tasksComplete: [...this.state.tasksComplete, task],
-      incomplete: this.state.incomplete - 1,
-      complete: this.state.complete + 1,
+      incomplete: this.state.tasksIncomplete.length,
+      complete: this.state.tasksComplete.length,
     }));
-    console.log("incomplete: " + this.state.incomplete);
+    console.log("incomplete: " + this.state.tasksIncomplete.length);
     console.log("complete: " + this.state.complete);
   }
 
-  handleCompleteTask2 = (task) =>
+  handleCompleteTask2 = (task) => {
+    // this.setState((prevState) => {
+    //   /* const newCompleteCount = prevState.complete > 0 ? prevState.complete - 1 : prevState.complete;
+    //   const newIncompleteCount = prevState.incomplete + 1; */
+
+    //   return {
+    //     tasksComplete: this.state.tasksComplete.filter(e => e !== task),
+    //   tasksIncomplete: [...this.state.tasksIncomplete, task],
+    //     complete: this.state.tasksComplete.length,
+    //     incomplete: this.state.tasksIncomplete.length,
+    //   };
+    // }, () => {
+    //   console.log("incomplete: " + this.state.incomplete);
+    //   console.log("complete: " + this.state.complete);
+    // });
+    if (this.state.tasksComplete.length <= 10) {
+      this.setState(() => ({
+        plantVariable: this.state.tasksComplete.length,
+      }));
+    }
+    else if (this.state.tasksComplete.length > 10) {
+      this.setState(() => ({
+        plantVariable: 10,
+      }));
+    }
     this.setState(() => ({
       tasksComplete: this.state.tasksComplete.filter(e => e !== task),
       tasksIncomplete: [...this.state.tasksIncomplete, task],
-      incomplete: this.state.incomplete + 1,
-      complete: this.state.complete - 1,
+      incomplete: this.state.tasksIncomplete.length,
+      complete: this.state.tasksComplete.length,
     }))
+  }
 
 
   render() {
@@ -213,7 +227,7 @@ export default class App extends Component {
           </View>
         </View>
 
-         <View style={{ display: this.state.tasksPageDisplay }}>
+        <View style={{ display: this.state.tasksPageDisplay }}>
           <View style={styles.container2}>
 
             <TouchableHighlight onPress={this.toggleAddTaskDisplay} >
@@ -223,38 +237,39 @@ export default class App extends Component {
             <View style={{ display: this.state.addTaskDisplay }}>
               <View style={styles.container4}>
                 <TextInput style={styles.inputtext}
-                placeholder='Enter task'
+                  placeholder='Enter task'
                   value={this.state.addTask}
                   onChangeText={(val) => this.setState({
                     addTask: val,
                   })}
                 ></TextInput>
-                <TouchableHighlight onPress={this.addNewTask} style={styles.addtask}>
+                <TouchableHighlight onPress={() => this.addNewTask()} style={styles.addtask}>
                   <Text style={styles.addtask}>Add task!</Text>
                 </TouchableHighlight>
               </View>
             </View>
+            <ScrollView>
+              {this.state.tasksIncomplete.map((task, i) => (
+                <TouchableHighlight key={i} onPress={() => this.handleIncompleteTask2(task)}>
 
-            {this.state.tasksIncomplete.map((task, i) => (
-              <TouchableHighlight key={i} onPress={() => this.handleIncompleteTask2(task)}>
-
-                <View style={styles.task} >
-                  <Text style={styles.tasktext}>{task}</Text>
-                </View>
-              </TouchableHighlight>
-            ))
-            }
-            <View style={{ "textDecoration": "line-through" }}>
-              {this.state.tasksComplete.map((task, i) => (
-                <TouchableHighlight key={i} onPress={() => this.handleCompleteTask2(task)}>
-                  <View style={styles.task}>
+                  <View style={styles.task} >
                     <Text style={styles.tasktext}>{task}</Text>
                   </View>
                 </TouchableHighlight>
               ))
               }
-            </View>
+              <View style={{ "textDecoration": "line-through" }}>
+                {this.state.tasksComplete.map((task, i) => (
+                  <TouchableHighlight key={i} onPress={() => this.handleCompleteTask2(task)}>
+                    <View style={styles.task}>
+                      <Text style={styles.tasktext}>{task}</Text>
+                    </View>
+                  </TouchableHighlight>
+                ))
+                }
 
+              </View>
+            </ScrollView>
             <TouchableHighlight onPress={() => this._storeData()}><Text>End Day</Text></TouchableHighlight>
 
           </View>
@@ -286,7 +301,7 @@ export default class App extends Component {
           </View>
         </View>
 
-         <View style={{ display: this.state.plantPageDisplay }}>
+        <View style={{ display: this.state.plantPageDisplay }}>
           <View style={styles.container6}>
             <View>
               <TextInput style={styles.inputtext}
@@ -334,18 +349,22 @@ export default class App extends Component {
               </Text>
             </TouchableHighlight>
           </View>
-        </View> 
+        </View>
 
-         <View style={{ display: this.state.historyPageDisplay }}>
+        <View style={{ display: this.state.historyPageDisplay }}>
           <View style={styles.container5}>
             <Text style={styles.statsText}>{this.state.plantName}'s Calendar:</Text>
 
             <View style={styles.calStyle}>
-            <Calendar onDayPress={day => this._getData(this.formatDate(day.dateString))} />
+              <Calendar onDayPress={day => this._getData(this.formatDate(day.dateString))} />
             </View>
-
+            {/* 
+            <Text style={styles.statsText}>Completed Tasks: {this.state.tasksComplete.length}</Text>
+            <Text style={styles.statsText}>Incompleted Tasks: {this.state.tasksIncomplete.length}</Text>
+ */}
             <Text style={styles.statsText}>Completed Tasks: {this.state.daysCompleteTasks}</Text>
             <Text style={styles.statsText}>Incompleted Tasks: {this.state.daysIncompleteTasks}</Text>
+
 
           </View>
           <View style={styles.navcontainer}>
@@ -376,8 +395,8 @@ export default class App extends Component {
           </View>
 
 
-        </View> 
-        
+        </View>
+
         <StatusBar style="auto" />
       </View>
     );
@@ -460,4 +479,72 @@ const styles = StyleSheet.create({
     color: 'pink',
     fontWeight: 'bold',
   },
+  addtask: {
+    fontSize: deviceHeight / 35,
+    height: deviceHeight / 25,
+    width: deviceWidth / 5,
+    color: 'pink',
+    fontWeight: 'bold',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+  },
+  tasktext: {
+    fontSize: deviceHeight / 20,
+    color: 'green',
+  },
+  addTaskDisplay: {
+    height: deviceHeight / 10,
+    width: deviceWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    flexDirection: 'row',
+    borderColor: 'green',
+    borderWidth: 2,
+  },
+  inputtext: {
+    fontSize: deviceHeight / 35,
+    color: 'green',
+    height: deviceHeight / 25,
+    width: deviceWidth / 3.5,
+    borderColor: 'green',
+    borderWidth: 2,
+    backgroundColor: 'pink',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    margin: 5,
+  },
+  calStyle: {
+    width: 4 * (deviceWidth / 6)
+  },
+  navcontainer: {
+    height: deviceHeight / 6,
+    width: deviceWidth,
+    backgroundColor: 'pink',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    flexDirection: 'row',
+  },
+  buttoncontainer: {
+    height: deviceHeight / 15,
+    width: deviceWidth / 3.5,
+    borderColor: 'green',
+    borderWidth: 2,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    margin: 5,
+  },
+  buttontext: {
+    fontSize: deviceHeight / 20,
+    color: 'green',
+  },
+  imageFormatting: {
+    height: deviceHeight / 2,
+    width: deviceHeight / 2
+  }
 });
