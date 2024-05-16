@@ -16,7 +16,7 @@ Team Members: Sneha Shekhar, Marie Cho, Aanya Singh
   - Zoom in on a day (Select a day on the task history calendar, and this screen displays the stats from that day!)
 - We have a nav bar on each page for easy navigation.
 - [app layout.pdf](https://github.com/chomarieh2006/Blossom-App/files/14824910/app.layout.pdf)
-- 
+- [slideshow presentation](https://docs.google.com/presentation/d/1ba4EgjW80DL4he5TgKWLW8-_ufVo8VSYcfioQRJRkwg/edit?usp=sharing)
 ### Elements:
 - To-Do List:
   - Here, you can add new tasks for yourself to do.
